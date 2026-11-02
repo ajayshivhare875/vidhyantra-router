@@ -1,15 +1,22 @@
 services:
   - type: web
-    name: vidhyantra-router
+    name: codepro-ai
     runtime: python
     plan: free
     region: singapore
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn backend:app --bind 0.0.0.0:$PORT --workers 2 --timeout 150
+    startCommand: python run.py
+    healthCheckPath: /health
     envVars:
       - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: RUN_BOT
         value: "1"
       - key: VIDHYANTRA_CODEX_KEY
         sync: false
       - key: VIDHYANTRA_GET_KEY
+        sync: false
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
         sync: false
