@@ -1,10 +1,9 @@
 """
 Vidhyantra Router - OpenAI-compatible AI gateway powered ONLY by Vidhyantra.
-Models (public name -> upstream):
-  - codepro        -> Code-X API, upstream model "vidhyora-code" (passthrough)
-  - sol, ultra, ...-> Get API (translated; see call_get_api TODO)
+Model:
+  - codepro -> Code-X API, upstream "vidhyora-code" (OpenAI-compatible passthrough)
 Run: python backend.py   (PORT env, default 5000)
-Env: VIDHYANTRA_CODEX_KEY (vdc_...), VIDHYANTRA_GET_KEY (vdk_...)
+Env: VIDHYANTRA_CODEX_KEY (vdc_...)
 """
 import os, json, time, secrets, requests
 from flask import Flask, request, jsonify, Response
@@ -162,7 +161,6 @@ def health():
 def models():
     return jsonify({"object": "list", "data": [
         {"id": "codepro", "object": "model", "owned_by": "vidhyantra-router"},
-        {"id": "sol", "object": "model", "owned_by": "vidhyantra"},
     ]})
 
 @app.route("/get-key", methods=["GET", "POST"])
@@ -198,15 +196,16 @@ def chat_completions():
                                   "code": "bad_request"}}), 400
 
     mapped = MODEL_MAP.get(model)
-    if mapped and mapped[0] == "codex":
-        up = call_codex({"model": mapped[1], "messages": messages,
-                         "max_tokens": body.get("max_tokens", 4096),
-                         "temperature": body.get("temperature", 0.7)})
-        # echo the public name back, like OpenAI does
-        if up.get("ok") and isinstance(up.get("data"), dict):
-            up["data"]["model"] = model
-    else:
-        up = call_get_api(model, openai_messages_to_text(messages))
+    if not (mapped and mapped[0] == "codex"):
+        return jsonify({"error": {
+            "message": f"Unknown model '{model}'. Available models: codepro",
+            "code": "unknown_model"}}), 400
+    up = call_codex({"model": mapped[1], "messages": messages,
+                     "max_tokens": body.get("max_tokens", 4096),
+                     "temperature": body.get("temperature", 0.7)})
+    # echo the public name back, like OpenAI does
+    if up.get("ok") and isinstance(up.get("data"), dict):
+        up["data"]["model"] = model
 
     if not up["ok"]:
         code = up.get("status", 502)
