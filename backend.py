@@ -2,7 +2,7 @@
 Vidhyantra Router - OpenAI-compatible AI gateway powered ONLY by Vidhyantra.
 Models:
   - codepro -> Code-X API, upstream "vidhyora-code" (OpenAI-compatible passthrough)
-  - sol, ultra, quick, ... -> Get API (translated; any other model ID passes through)
+  - sol, terra, ultra, quick, chatgpt56, code, ... -> Get API (translated; any other model ID passes through)
 Run: python backend.py   (PORT env, default 5000)
 Env: VIDHYANTRA_CODEX_KEY (vdc_...), VIDHYANTRA_GET_KEY (vdk_...)
 """
@@ -163,8 +163,11 @@ def models():
     return jsonify({"object": "list", "data": [
         {"id": "codepro", "object": "model", "owned_by": "vidhyantra-router"},
         {"id": "sol", "object": "model", "owned_by": "vidhyantra"},
+        {"id": "terra", "object": "model", "owned_by": "vidhyantra"},
         {"id": "ultra", "object": "model", "owned_by": "vidhyantra"},
         {"id": "quick", "object": "model", "owned_by": "vidhyantra"},
+        {"id": "chatgpt56", "object": "model", "owned_by": "vidhyantra"},
+        {"id": "code", "object": "model", "owned_by": "vidhyantra"},
     ]})
 
 @app.route("/get-key", methods=["GET", "POST"])
