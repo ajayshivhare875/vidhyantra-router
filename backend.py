@@ -113,6 +113,10 @@ def call_get_api(model, message):
     if not GET_KEY:
         return {"ok": False, "status": 500,
                 "error": "server misconfigured: VIDHYANTRA_GET_KEY not set"}
+    # Get API limit: each message must be 8000 chars or fewer.
+    # Truncate from the front (keep the most recent = user's actual question).
+    if len(message) > 7500:
+        message = "...[earlier content truncated]...\n" + message[-7500:]
     try:
         r = requests.post(GETAPI_URL,
                           json={"model": model, "message": message},
