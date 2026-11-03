@@ -4,7 +4,7 @@ OpenAI-compatible AI gateway powered **only by Vidhyantra** (free distribution).
 
 ## Models
 - `codepro` → Code-X API, upstream `vidhyora-code` (OpenAI-native passthrough)
-- `sol`, `terra`, `ultra`, `quick`, `chatgpt56`, `code`, … → Get API (translated to OpenAI format; any other model ID passes through as-is)
+- `sol` (ChatGPT 6 Sol), `terra` (GPT-5.6 Terra), `chatgpt56` (ChatGPT 6 Luna), `ultra` (Vidhyantra Ultra), `quick` (Vidhyantra Quick), `code` (Vidhyantra Code) → Get API (translated to OpenAI format; any other model ID passes through as-is)
 
 ## API
 - `POST /v1/chat/completions` — `Authorization: Bearer <vdr_key>`
