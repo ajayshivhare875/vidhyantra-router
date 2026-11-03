@@ -35,7 +35,7 @@ def main_kb():
 WELCOME = (
     "🚀 Welcome to CodePro!\n\n"
     "Free AI API, powered by Vidhyantra.\n\n"
-    "• Models: codepro (coding), sol / terra / ultra / quick / chatgpt56 / code (chat)\n"
+    "• Models: codepro, ChatGPT 6 Sol, GPT-5.6 Terra, ChatGPT 6 Luna, Ultra, Quick, Code\n"
     "• OpenAI-compatible: works with Cline, CodeGPT & more\n"
     "• Base URL: https://codepro-ai.onrender.com/v1\n\n"
     "Tap 🔑 Get API Key to start — it's free!"
@@ -76,8 +76,12 @@ async def on_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await q.edit_message_text(
             "🤖 Available models:\n\n"
             "• codepro — coding & agentic tasks\n"
-            "• sol / terra / ultra / quick / chatgpt56 — chat\n"
-            "• code — coding via Get API\n\n"
+            "• ChatGPT 6 Sol — flagship, deep reasoning\n"
+            "• GPT-5.6 Terra — balanced, everyday pro work\n"
+            "• ChatGPT 6 Luna — fast, everyday chat\n"
+            "• Vidhyantra Ultra — most capable\n"
+            "• Vidhyantra Quick — fast & lightweight\n"
+            "• Vidhyantra Code — coding via Get API\n\n"
             "OpenAI-compatible via /v1/chat/completions.",
             reply_markup=main_kb())
     elif d == "help":
