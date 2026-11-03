@@ -20,16 +20,33 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 KEYS_FILE = os.path.join(DATA_DIR, "keys.json")
 os.makedirs(DATA_DIR, exist_ok=True)
 
+# Supabase persistence (keys survive redeploys); file fallback if DB unreachable
+try:
+    from db_store import db_load, db_save, db_enabled, _DB_ERROR, _MISSING
+    HAS_DB = True
+except ImportError:
+    HAS_DB = False
+KEYS_DOC = "router.keys"
+
 # ---------------- key store ----------------
 def load_keys():
+    if HAS_DB and db_enabled():
+        d = db_load(KEYS_DOC)
+        if d is not _DB_ERROR and d is not _MISSING:
+            return d if isinstance(d, dict) else {}
     try:
         with open(KEYS_FILE) as f: return json.load(f)
     except Exception: return {}
 
 def save_keys(d):
-    tmp = KEYS_FILE + ".tmp"
-    with open(tmp, "w") as f: json.dump(d, f)
-    os.replace(tmp, KEYS_FILE)
+    try:
+        tmp = KEYS_FILE + ".tmp"
+        with open(tmp, "w") as f: json.dump(d, f)
+        os.replace(tmp, KEYS_FILE)
+    except Exception: pass
+    if HAS_DB and db_enabled():
+        try: db_save(KEYS_DOC, d)
+        except Exception: pass
 
 def new_api_key():
     return "vdr_" + secrets.token_urlsafe(24)
