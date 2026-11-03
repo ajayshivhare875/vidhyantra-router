@@ -71,15 +71,23 @@ def extract_getapi_text(d):
     try:
         if d is None: return ""
         if isinstance(d, str): return d
+        text = ""
         if isinstance(d.get("choices"), list) and d["choices"]:
             m = d["choices"][0].get("message") or {}
             if isinstance(m.get("content"), str) and m["content"].strip():
-                return m["content"]
-        for k in ["reply", "response", "message", "answer", "text",
-                  "content", "output", "result"]:
-            v = d.get(k)
-            if isinstance(v, str) and v.strip(): return v
-        return ""
+                text = m["content"]
+        if not text:
+            for k in ["reply", "response", "message", "answer", "text",
+                      "content", "output", "result"]:
+                v = d.get(k)
+                if isinstance(v, str) and v.strip():
+                    text = v
+                    break
+        # Get API double-escapes: literal \n instead of real newlines
+        if text and "\\n" in text:
+            text = text.replace("\\n", "\n").replace("\\t", "\t")
+            text = text.replace('\\"', '"').replace("\\'", "'")
+        return text
     except Exception: return ""
 
 def call_get_api(model, message):
