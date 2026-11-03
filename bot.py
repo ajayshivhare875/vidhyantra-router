@@ -35,7 +35,7 @@ def main_kb():
 WELCOME = (
     "🚀 Welcome to CodePro!\n\n"
     "Free AI API, powered by Vidhyantra.\n\n"
-    "• Model: codepro (coding & agentic tasks)\n"
+    "• Models: codepro (coding), sol / ultra / quick (chat)\n"
     "• OpenAI-compatible: works with Cline, CodeGPT & more\n"
     "• Base URL: https://codepro-ai.onrender.com/v1\n\n"
     "Tap 🔑 Get API Key to start — it's free!"
@@ -74,8 +74,9 @@ async def on_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=main_kb())
     elif d == "models":
         await q.edit_message_text(
-            "🤖 Available model:\n\n"
-            "• codepro — coding & agentic tasks\n\n"
+            "🤖 Available models:\n\n"
+            "• codepro — coding & agentic tasks\n"
+            "• sol / ultra / quick — chat\n\n"
             "OpenAI-compatible via /v1/chat/completions.",
             reply_markup=main_kb())
     elif d == "help":
