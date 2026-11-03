@@ -122,7 +122,7 @@ def call_get_api(model, message):
                           json={"model": model, "message": message},
                           headers={"Authorization": "Bearer " + GET_KEY,
                                    "Content-Type": "application/json"},
-                          timeout=120)
+                          timeout=300)
         try: data = r.json()
         except Exception: data = {"_raw": r.text[:2000]}
         if r.status_code >= 300:
