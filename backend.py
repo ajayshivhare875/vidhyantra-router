@@ -186,6 +186,32 @@ def get_key():
         "<code>/v1/chat/completions</code>.</p>",
         mimetype="text/html")
 
+def sse_stream_response(model, text):
+    """Emit OpenAI-style SSE stream for clients that request stream:true."""
+    def gen():
+        cid = "chatcmpl-vdr-" + secrets.token_hex(8)
+        ts = int(time.time())
+        # Chunk by words for a natural typing effect
+        words = text.split(" ")
+        for i, w in enumerate(words):
+            piece = w + (" " if i < len(words) - 1 else "")
+            yield "data: " + json.dumps({
+                "id": cid, "object": "chat.completion.chunk",
+                "created": ts, "model": model,
+                "choices": [{"index": 0, "delta": {"content": piece},
+                             "finish_reason": None}],
+            }) + "\n\n"
+        yield "data: " + json.dumps({
+            "id": cid, "object": "chat.completion.chunk",
+            "created": ts, "model": model,
+            "choices": [{"index": 0, "delta": {},
+                         "finish_reason": "stop"}],
+        }) + "\n\n"
+        yield "data: [DONE]\n\n"
+    return Response(gen(), mimetype="text/event-stream",
+                    headers={"Cache-Control": "no-cache",
+                             "X-Accel-Buffering": "no"})
+
 @app.route("/v1/chat/completions", methods=["POST"])
 def chat_completions():
     rec = check_key()
@@ -223,6 +249,20 @@ def chat_completions():
         keys = load_keys(); r = keys.get(rec["key"])
         if r: r["last_used"] = int(time.time()); save_keys(keys)
     except Exception: pass
+    # Streaming mode (CodeGPT, Cline, etc. request stream:true)
+    if body.get("stream"):
+        data = up["data"] if isinstance(up.get("data"), dict) else {}
+        text = ""
+        try:
+            ch = data.get("choices") or []
+            if ch:
+                msg = ch[0].get("message") or {}
+                text = msg.get("content") or ""
+        except Exception:
+            text = ""
+        if not text:
+            text = "(empty response)"
+        return sse_stream_response(model, text)
     return jsonify(up["data"])
 
 if __name__ == "__main__":
